@@ -28,6 +28,8 @@ public class HitsServiceImpl implements HitsService {
     public void saveHits(PostHitsDto postHitsDto) {
         log.info("saveHits for {} started", postHitsDto.getUri());
         Hits hits = mapper.map(postHitsDto, Hits.class);
+        LocalDateTime now = LocalDateTime.now();
+        hits.setTimestamp(now);
         Hits savedHits = hitsRepository.save(hits);
         log.info("saveHits for {} finished", savedHits.getUri());
     }

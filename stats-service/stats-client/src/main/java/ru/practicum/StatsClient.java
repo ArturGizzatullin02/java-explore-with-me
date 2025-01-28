@@ -8,7 +8,6 @@ import org.springframework.web.client.RestClient;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
@@ -28,7 +27,6 @@ public class StatsClient {
                 .app(APPLICATION_NAME)
                 .uri(uri)
                 .ip(ip)
-                .timestamp(LocalDateTime.now().toString())
                 .build();
 
         return restClient.post()
