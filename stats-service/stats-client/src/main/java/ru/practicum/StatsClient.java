@@ -21,7 +21,7 @@ public class StatsClient {
             .baseUrl("http://localhost:9090")
             .build();
 
-    private final String APPLICATION_NAME = "stats-service";
+    private static final String APPLICATION_NAME = "stats-service";
 
     public ResponseEntity<Void> hit(String uri, String ip) {
         PostHitsDto postHitsDto = PostHitsDto.builder()
