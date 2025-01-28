@@ -23,7 +23,6 @@ public class StatsClient {
 
     private final String APPLICATION_NAME = "stats-service";
 
-
     public ResponseEntity<Void> hit(String uri, String ip) {
         PostHitsDto postHitsDto = PostHitsDto.builder()
                 .app(APPLICATION_NAME)
