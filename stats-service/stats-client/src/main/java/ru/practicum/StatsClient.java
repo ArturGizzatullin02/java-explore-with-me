@@ -1,6 +1,7 @@
 package ru.practicum;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,11 @@ public class StatsClient {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    @Value(value = "${stats.client.base-url}")
+    private String baseUrl;
+
     private final RestClient restClient = RestClient.builder()
-            .baseUrl("http://localhost:9090")
+            .baseUrl(baseUrl)
             .build();
 
     private static final String APPLICATION_NAME = "stats-service";
