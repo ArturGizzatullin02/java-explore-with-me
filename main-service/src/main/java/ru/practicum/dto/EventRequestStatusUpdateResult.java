@@ -5,15 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserFullDto {
+public class EventRequestStatusUpdateResult {
 
-    private Long id;
+    private List<ParticipationRequestDto> confirmedRequests;
 
-    private String email;
-
-    private String name;
+    private List<ParticipationRequestDto> rejectedRequests;
 }

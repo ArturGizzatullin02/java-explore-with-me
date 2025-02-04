@@ -6,8 +6,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.dto.UserCreateDto;
-import ru.practicum.dto.UserFullDto;
+import ru.practicum.dto.NewUserRequest;
+import ru.practicum.dto.UserDto;
 import ru.practicum.model.User;
 import ru.practicum.repository.UserRepository;
 
@@ -24,13 +24,13 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper mapper;
 
     @Override
-    public UserFullDto saveUser(UserCreateDto userCreateDto) {
+    public UserDto saveUser(NewUserRequest userCreateDto) {
         log.info("saveUser for {} started", userCreateDto);
         User user = mapper.map(userCreateDto, User.class);
         userRepository.save(user);
-        UserFullDto userFullDto = mapper.map(user, UserFullDto.class);
-        log.info("saveUser for {} finished", userFullDto);
-        return userFullDto;
+        UserDto userDto = mapper.map(user, UserDto.class);
+        log.info("saveUser for {} finished", userDto);
+        return userDto;
     }
 
     @Override
@@ -41,14 +41,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Collection<UserFullDto> getUsers(List<Long> ids, int from, int size) {
+    public Collection<UserDto> getUsers(List<Long> ids, int from, int size) {
         log.info("getUsers for {} started", ids);
         PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
         Page<User> usersByIds = userRepository.findAllByIdIn(ids, page);
-        List<UserFullDto> userFullDtos = usersByIds.stream()
-                .map(user -> mapper.map(user, UserFullDto.class))
+        List<UserDto> userDtos = usersByIds.stream()
+                .map(user -> mapper.map(user, UserDto.class))
                 .toList();
         log.info("getUsers for {} finished", ids);
-        return userFullDtos;
+        return userDtos;
     }
 }

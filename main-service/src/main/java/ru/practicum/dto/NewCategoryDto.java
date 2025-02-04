@@ -1,6 +1,5 @@
 package ru.practicum.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,14 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserCreateDto {
+public class NewCategoryDto {
 
-    @Email
-    @Size(max = 120)
-    @NotBlank
-    private String email;
-
-    @NotBlank
-    @Size(max = 100)
+    @Size(max = 50, message = "Название категории должно быть не более 50 символов")
+    @NotBlank(message = "Название категории не может быть пустым")
     private String name;
 }
