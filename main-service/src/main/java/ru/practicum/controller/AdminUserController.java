@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
-public class UserController {
+public class AdminUserController {
 
     private final UserService userService;
 
@@ -44,10 +44,10 @@ public class UserController {
         return userDtos;
     }
 
-    @DeleteMapping("/admin/users/{id}")
-    public void deleteUser(@PathVariable long id) {
-        log.info("deleteUser for {} started", id);
-        userService.deleteUser(id);
-        log.info("deleteUser for {} finished", id);
+    @DeleteMapping("/admin/users/{userId}")
+    public void deleteUser(@PathVariable long userId) {
+        log.info("deleteUser for {} started", userId);
+        userService.deleteUser(userId);
+        log.info("deleteUser for {} finished", userId);
     }
 }
