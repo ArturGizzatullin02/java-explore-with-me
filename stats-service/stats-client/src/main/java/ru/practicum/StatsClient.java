@@ -17,12 +17,16 @@ public class StatsClient {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    @Value(value = "${stats.client.base-url}")
+    private final RestClient restClient;
+
+    @Value(value = "${STATS_CLIENT_BASE_URL}")
     private String baseUrl;
 
-    private final RestClient restClient = RestClient.builder()
-            .baseUrl(baseUrl)
-            .build();
+    public StatsClient() {
+        this.restClient = RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+    }
 
     private static final String APPLICATION_NAME = "stats-service";
 

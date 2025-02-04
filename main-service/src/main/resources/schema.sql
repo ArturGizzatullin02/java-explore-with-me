@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS requests
     status       VARCHAR(9) NOT NULL,
 
     CONSTRAINT fk_requester_id FOREIGN KEY (requester_id) REFERENCES users (user_id) ON DELETE CASCADE,
-    CONSTRAINT fk_event_id FOREIGN KEY (event_id) REFERENCES events (event_id) ON DELETE CASCADE
+    CONSTRAINT fk_event_id FOREIGN KEY (event_id) REFERENCES events (event_id) ON DELETE CASCADE -- TODO почему-то именно эти внешние ключи не создаются при выполнении общего запроса schema.sql
 );
 
 CREATE TABLE IF NOT EXISTS compilations
