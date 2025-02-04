@@ -2,13 +2,9 @@ package ru.practicum.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,41 +13,34 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "compilations")
+@Table(name = "locations")
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Compilation {
+public class Location {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "compilation_id")
+    @Column(name = "location_id")
     private Long id;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "compilation_event",
-            joinColumns = @JoinColumn(name = "compilation_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private List<Event> event;
+    @Column(name = "lat")
+    private Float lat;
 
-    @Column(name = "pinned")
-    private Boolean pinned;
-
-    @Column(name = "title")
-    private String title;
+    @Column(name = "lon")
+    private Float lon;
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        Compilation that = (Compilation) o;
-        return Objects.equals(id, that.id);
+        Location location = (Location) o;
+        return Objects.equals(id, location.id);
     }
 
     @Override
