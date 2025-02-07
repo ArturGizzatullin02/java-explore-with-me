@@ -43,7 +43,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Collection<UserDto> getUsers(List<Long> ids, int from, int size) {
         log.info("getUsers for {} started", ids);
-        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+        if (ids == null || ids.isEmpty()) {
+            log.info("getUsers for {} finished", ids);
+            return List.of();
+        }
+        PageRequest page = PageRequest.of(from / size , size);
         Page<User> usersByIds = userRepository.findAllByIdIn(ids, page);
         List<UserDto> userDtos = usersByIds.stream()
                 .map(user -> mapper.map(user, UserDto.class))
