@@ -41,7 +41,7 @@ public class Request {
     private Long event;
 
     @Column(name = "status")
-    private Status status;
+    private ParticipationRequestStatus status;
 
     @Override
     public boolean equals(Object o) {

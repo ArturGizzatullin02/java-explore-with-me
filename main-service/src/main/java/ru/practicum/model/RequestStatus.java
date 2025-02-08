@@ -1,6 +1,6 @@
 package ru.practicum.model;
 
-public enum Status {
+public enum RequestStatus {
     CONFIRMED,
     REJECTED,
 }

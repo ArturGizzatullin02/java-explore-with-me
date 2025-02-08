@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.model.Status;
+import ru.practicum.model.RequestStatus;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ public class EventRequestStatusUpdateRequest {
 
     private List<Long> requestIds;
 
-    private Status status;
+    private RequestStatus status;
 }
