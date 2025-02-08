@@ -21,4 +21,11 @@ public class ErrorHandler {
         log.warn(e.getMessage(), e);
         return new ApiError(e.getMessage(), e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR.toString(), LocalDateTime.now().toString());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleException(EntityNotFoundException e) {
+        log.warn(e.getMessage(), e);
+        return new ApiError(e.getMessage(), e.getLocalizedMessage(), HttpStatus.NOT_FOUND.toString(), LocalDateTime.now().toString());
+    }
 }
