@@ -17,7 +17,7 @@ public class GetEventParametersUserRequest {
 
     private String text;
 
-    private List<Integer> categories;
+    private List<Long> categories;
 
     private Boolean paid;
 

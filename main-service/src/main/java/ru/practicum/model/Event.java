@@ -10,8 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedAttributeNode;
-import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,14 +23,6 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "events")
-//@NamedEntityGraph(
-//        name = "Event.withLocationAndCategory",
-//        attributeNodes = {
-//                @NamedAttributeNode(value = "location"),
-//                @NamedAttributeNode(value = "category"),
-//                @NamedAttributeNode(value = "initiator")
-//        }
-//)
 @Getter
 @Setter
 @ToString(exclude = {"category", "location", "initiator"})
@@ -59,7 +49,7 @@ public class Event {
     @Column(name = "event_date")
     private LocalDateTime eventDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "location_id")
     private Location location;
 

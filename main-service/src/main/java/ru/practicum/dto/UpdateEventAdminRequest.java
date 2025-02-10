@@ -16,11 +16,11 @@ public class UpdateEventAdminRequest {
 
     private String annotation;
 
-    private CategoryDto category;
+    private Long category;
 
     private String description;
 
-    private LocalDateTime eventDate;
+    private String eventDate;
 
     private Location location;
 

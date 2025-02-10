@@ -60,7 +60,7 @@ public class PrivateEventController {
     public EventFullDto patchEventOfCurrentUser(@PathVariable long userId, @PathVariable long eventId,
                                                 @RequestBody UpdateEventUserRequest updateEventDto) {
         log.info("patchEventOfCurrentUser for {} started", eventId);
-        EventFullDto eventFullDto = eventService.patchEventOfCurrentUser(userId, eventId, updateEventDto);
+        EventFullDto eventFullDto = eventService.patchEvent(userId, eventId, updateEventDto);
         log.info("patchEventOfCurrentUser for {} finished", eventFullDto);
         return eventFullDto;
     }
