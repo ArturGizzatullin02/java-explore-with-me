@@ -15,11 +15,11 @@ import java.util.List;
 @Builder
 public class GetEventParametersAdminRequest {
 
-    private List<Integer> users;
+    private List<Long> users;
 
     private List<EventState> states;
 
-    private List<Integer> categories;
+    private List<Long> categories;
 
     private LocalDateTime rangeStart;
 

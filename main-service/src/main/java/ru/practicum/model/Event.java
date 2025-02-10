@@ -2,12 +2,16 @@ package ru.practicum.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,9 +25,17 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "events")
+//@NamedEntityGraph(
+//        name = "Event.withLocationAndCategory",
+//        attributeNodes = {
+//                @NamedAttributeNode(value = "location"),
+//                @NamedAttributeNode(value = "category"),
+//                @NamedAttributeNode(value = "initiator")
+//        }
+//)
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"category", "location", "initiator"})
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -77,6 +89,7 @@ public class Event {
     private LocalDateTime publishedOn;
 
     @Column(name = "state")
+    @Enumerated(EnumType.STRING)
     private EventState state;
 
     @Column(name = "views")

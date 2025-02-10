@@ -2,6 +2,7 @@ package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +16,10 @@ import ru.practicum.model.EventState;
 import ru.practicum.service.EventService;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -25,13 +29,18 @@ public class AdminEventController {
     private final EventService eventService;
 
     @GetMapping("/admin/events")
-    public List<EventFullDto> getEventsByParams(@RequestParam List<Integer> users,
+    public List<EventFullDto> getEventsByParams(@RequestParam List<Long> users,
                                                 @RequestParam List<EventState> states,
-                                                @RequestParam List<Integer> categories,
-                                                @RequestParam LocalDateTime rangeStart,
-                                                @RequestParam LocalDateTime rangeEnd,
+                                                @RequestParam List<Long> categories,
+                                                @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                                @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                                 @RequestParam(defaultValue = "0") int from,
                                                 @RequestParam(defaultValue = "10") int size) {
+
+//        List<EventState> stateList = states != null ?
+//                Arrays.stream(states.split(","))
+//                        .map(EventState::valueOf)
+//                        .toList() : Collections.emptyList();
 
         GetEventParametersAdminRequest parameters = GetEventParametersAdminRequest.builder()
                 .users(users)

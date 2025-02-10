@@ -10,6 +10,7 @@
 //import ru.practicum.dto.EventShortDto;
 //import ru.practicum.dto.GetEventParametersUserRequest;
 //import ru.practicum.model.EventSort;
+//import ru.practicum.service.EventService;
 //
 //import java.time.LocalDateTime;
 //import java.util.List;
