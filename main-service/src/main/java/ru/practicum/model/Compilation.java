@@ -36,10 +36,10 @@ public class Compilation {
     private Long id;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "compilation_event",
+    @JoinTable(name = "compilations_events",
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private List<Event> event;
+    private List<Event> events;
 
     @Column(name = "pinned")
     private Boolean pinned;

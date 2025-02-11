@@ -172,11 +172,7 @@ public class EventServiceImpl implements EventService {
             eventFromRepository.setDescription(event.getDescription());
         }
         if (event.getEventDate() != null) {
-            String eventDateFrom = event.getEventDate();
-            log.info("Строка с датой: '{}'", eventDateFrom);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime eventDate = LocalDateTime.parse(eventDateFrom, formatter);
-            eventFromRepository.setEventDate(eventDate);
+            eventFromRepository.setEventDate(event.getEventDate());
         }
         if (event.getLocation() != null) {
             if (event.getLocation().getId() == null) {
