@@ -37,11 +37,6 @@ public class AdminEventController {
                                                 @RequestParam(defaultValue = "0") int from,
                                                 @RequestParam(defaultValue = "10") int size) {
 
-//        List<EventState> stateList = states != null ?
-//                Arrays.stream(states.split(","))
-//                        .map(EventState::valueOf)
-//                        .toList() : Collections.emptyList();
-
         GetEventParametersAdminRequest parameters = GetEventParametersAdminRequest.builder()
                 .users(users)
                 .states(states)

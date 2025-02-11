@@ -225,7 +225,7 @@ public class EventServiceImpl implements EventService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User %d not found", userId)));
         event.setInitiator(user);
-        event.setState(EventState.WAITING);
+        event.setState(EventState.PENDING);
 
         Category category = categoryRepository.findById(eventDto.getCategory())
                 .orElseThrow(() -> new CategoryNotFoundException(String

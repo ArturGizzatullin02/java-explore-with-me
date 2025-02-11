@@ -11,7 +11,7 @@ public enum AdminStateAction {
             case PUBLISH_EVENT:
                 return EventState.PUBLISHED;
             case REJECT_EVENT:
-                return EventState.CANCELLED;
+                return EventState.CANCELED;
             default:
                 throw new IllegalArgumentException("Unknown admin action: " + this);
         }

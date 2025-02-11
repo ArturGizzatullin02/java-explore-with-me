@@ -9,9 +9,9 @@ public enum UserStateAction {
     public EventState toEventState() {
         switch (this) {
             case SEND_TO_REVIEW:
-                return EventState.WAITING;
+                return EventState.PENDING;
             case CANCEL_REVIEW:
-                return EventState.CANCELLED;
+                return EventState.CANCELED;
             default:
                 throw new IllegalArgumentException("Unknown admin action: " + this);
         }

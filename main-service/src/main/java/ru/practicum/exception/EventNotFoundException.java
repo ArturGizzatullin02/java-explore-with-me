@@ -1,6 +1,7 @@
 package ru.practicum.exception;
 
-public class EventNotFoundException extends RuntimeException {
-    public EventNotFoundException(String message) {
+public class EventNotFoundException extends EntityNotFoundException {
+    public EventNotFoundException(final String message) {
+        super(message);
     }
 }
