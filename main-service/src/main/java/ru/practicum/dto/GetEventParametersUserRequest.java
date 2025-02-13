@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.model.EventSort;
+import ru.practicum.validator.StartBeforeEndUserConstraint;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@StartBeforeEndUserConstraint
 public class GetEventParametersUserRequest {
 
     private String text;

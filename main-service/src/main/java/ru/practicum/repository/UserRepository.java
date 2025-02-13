@@ -10,4 +10,6 @@ import java.util.Collection;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findAllByIdIn(Collection<Long> ids, Pageable pageable);
+
+    Boolean existsByEmail(String email);
 }

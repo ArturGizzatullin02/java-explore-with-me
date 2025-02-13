@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.model.EventState;
+import ru.practicum.validator.StartBeforeEndAdminConstraint;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@StartBeforeEndAdminConstraint
 public class GetEventParametersAdminRequest {
 
     private List<Long> users;

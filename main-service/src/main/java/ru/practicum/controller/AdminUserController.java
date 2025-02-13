@@ -38,9 +38,9 @@ public class AdminUserController {
     }
 
     @GetMapping("/admin/users")
-    public Collection<UserDto> getUsersByIds(@RequestParam List<Long> ids,
-                                             @RequestParam(defaultValue = "0") int from,
-                                             @RequestParam(defaultValue = "10") int size) {
+    public Collection<UserDto> getUsersByIds(@RequestParam(required = false) List<Long> ids,
+                                             @RequestParam(required = false, defaultValue = "0") int from,
+                                             @RequestParam(required = false, defaultValue = "10") int size) {
         log.info("getUsersByIds for {} {} {} started", ids, from, size);
         Collection<UserDto> userDtos = userService.getUsers(ids, from, size);
         log.info("getUsersByIds for {} {} {} finished", ids, from, size);

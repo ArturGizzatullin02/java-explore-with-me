@@ -20,8 +20,8 @@ public class PublicCompilationController {
 
     @GetMapping("/compilations")
     public List<CompilationDto> getCompilations(@RequestParam(required = false, defaultValue = "false") Boolean pinned,
-                                                @RequestParam(defaultValue = "0") int from,
-                                                @RequestParam(defaultValue = "10") int size) {
+                                                @RequestParam(required = false, defaultValue = "0") int from,
+                                                @RequestParam(required = false, defaultValue = "10") int size) {
         log.info("getCompilations for {} {} started", pinned, size);
         List<CompilationDto> compilationDtos = compilationService.getCompilations(pinned, from, size);
         log.info("getCompilations for {} {} finished", pinned, compilationDtos);

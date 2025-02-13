@@ -37,7 +37,7 @@ public class EventFullDto {
 
     private String title;
 
-    private Integer confirmedRequests;
+    private int confirmedRequests;
 
     private LocalDateTime createdOn;
 
@@ -47,5 +47,5 @@ public class EventFullDto {
 
     private EventState state;
 
-    private Integer views;
+    private int views;
 }

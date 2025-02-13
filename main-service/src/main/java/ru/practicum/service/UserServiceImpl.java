@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.NewUserRequest;
 import ru.practicum.dto.UserDto;
+import ru.practicum.exception.UserAlreadyExistsException;
 import ru.practicum.model.User;
 import ru.practicum.repository.UserRepository;
 
@@ -27,6 +28,10 @@ public class UserServiceImpl implements UserService {
     public UserDto saveUser(NewUserRequest userCreateDto) {
         log.info("saveUser for {} started", userCreateDto);
         User user = mapper.map(userCreateDto, User.class);
+        if (userRepository.existsByEmail(userCreateDto.getEmail())) {
+            throw new UserAlreadyExistsException(String
+                    .format("User with email %s already exists", userCreateDto.getEmail()));
+        }
         userRepository.save(user);
         UserDto userDto = mapper.map(user, UserDto.class);
         log.info("saveUser for {} finished", userDto);
@@ -43,11 +48,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public Collection<UserDto> getUsers(List<Long> ids, int from, int size) {
         log.info("getUsers for {} started", ids);
-        if (ids == null || ids.isEmpty()) {
-            log.info("getUsers for {} finished", ids);
-            return List.of();
-        }
         PageRequest page = PageRequest.of(from / size , size);
+        if (ids == null || ids.isEmpty()) {
+            Page<User> users = userRepository.findAll(page);
+            List<UserDto> userDtos = users.stream()
+                    .map(user -> mapper.map(user, UserDto.class))
+                    .toList();
+            log.info("getUsers for {} finished", ids);
+            return userDtos;
+        }
         Page<User> usersByIds = userRepository.findAllByIdIn(ids, page);
         List<UserDto> userDtos = usersByIds.stream()
                 .map(user -> mapper.map(user, UserDto.class))

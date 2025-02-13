@@ -3,12 +3,14 @@ package ru.practicum.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.model.Location;
+import ru.practicum.validator.EventDateConstraint;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +32,7 @@ public class NewEventDto {
     private String description;
 
     @NotNull(message = "Дата события не может быть пустой")
+    @EventDateConstraint(message = "Дата события должна быть позже текущего момента")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
@@ -40,6 +43,7 @@ public class NewEventDto {
     private Boolean paid = false;
 
     @Builder.Default
+    @PositiveOrZero(message = "Количество участников события не может быть отрицательным")
     private Integer participantLimit = 0;
 
     @Builder.Default

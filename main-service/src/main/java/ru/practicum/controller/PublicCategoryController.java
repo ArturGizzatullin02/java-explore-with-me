@@ -19,17 +19,17 @@ public class PublicCategoryController {
     private final CategoryService categoryService;
 
     @GetMapping("/categories")
-    public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0") int from,
-                                           @RequestParam(defaultValue = "10") int size) {
-        log.info("getCategories for {} {} started", from, size);
+    public List<CategoryDto> getCategories(@RequestParam(required = false, defaultValue = "0") int from,
+                                           @RequestParam(required = false, defaultValue = "10") int size) {
+        log.info("getCategories for from {} size {} started", from, size);
         List<CategoryDto> categoryDtos = categoryService.getAllCategoriesWithPageable(from, size);
-        log.info("getCategories for {} {} finished", from, categoryDtos);
+        log.info("getCategories for from {} size {} finished, result {}", from, size, categoryDtos);
         return categoryDtos;
     }
 
     @GetMapping("/categories/{catId}")
     public CategoryDto getCategory(@PathVariable long catId) {
-        log.info("getCategory for {} started", catId);
+        log.info("getCategory for category {} started", catId);
         CategoryDto categoryDto = categoryService.getCategoryById(catId);
         log.info("getCategory for {} finished", categoryDto);
         return categoryDto;

@@ -19,9 +19,13 @@ import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.dto.UpdateEventAdminRequest;
 import ru.practicum.dto.UpdateEventUserRequest;
 import ru.practicum.exception.CategoryNotFoundException;
+import ru.practicum.exception.EventAlreadyCanceledException;
+import ru.practicum.exception.EventAlreadyPublishedException;
 import ru.practicum.exception.EventNotFoundException;
 import ru.practicum.exception.LocationNotFoundException;
 import ru.practicum.exception.PermissionDeniedException;
+import ru.practicum.exception.RequestAlreadyConfirmedException;
+import ru.practicum.exception.RequestForLimitReachedEventException;
 import ru.practicum.exception.UserNotFoundException;
 import ru.practicum.model.Category;
 import ru.practicum.model.Event;
@@ -30,6 +34,7 @@ import ru.practicum.model.Location;
 import ru.practicum.model.ParticipationRequestStatus;
 import ru.practicum.model.QEvent;
 import ru.practicum.model.Request;
+import ru.practicum.model.RequestStatus;
 import ru.practicum.model.User;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
@@ -38,9 +43,9 @@ import ru.practicum.repository.RequestRepository;
 import ru.practicum.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -124,6 +129,11 @@ public class EventServiceImpl implements EventService {
             predicate.and(event.eventDate.before(parameters.getRangeEnd()));
         }
 
+        if (parameters.getRangeStart() == null && parameters.getRangeEnd() == null) {
+            predicate.and(event.eventDate.after(LocalDateTime.now()));
+
+        }
+
         if (Boolean.TRUE.equals(parameters.getOnlyAvailable())) {
             predicate.and(event.participantLimit.isNull()
                     .or(event.participantLimit.gt(event.confirmedRequests)));
@@ -131,27 +141,35 @@ public class EventServiceImpl implements EventService {
 
         Page<Event> events = eventRepository.findAll(predicate, page);
 
-        List<Event> sortedEvents;
-        switch (parameters.getSort()) {
-            case VIEWS:
-                sortedEvents = events.stream()
-                        .sorted(Comparator.comparingInt(Event::getViews).reversed())
-                        .toList();
-                break;
-            case EVENT_DATE:
-            default:
-                sortedEvents = events.stream()
-                        .sorted(Comparator.comparing(Event::getEventDate))
-                        .toList();
-                break;
+        if (parameters.getSort() == null) {
+            List<EventShortDto> eventShortDtos = events.stream()
+                    .map(eventEntity -> mapper.map(eventEntity, EventShortDto.class))
+                    .toList();
+            log.info("getEventsByParams for {} finished", parameters);
+            return eventShortDtos;
+        } else {
+            List<Event> sortedEvents;
+            switch (parameters.getSort()) {
+                case VIEWS:
+                    sortedEvents = events.stream()
+                            .sorted(Comparator.comparingInt(Event::getViews).reversed())
+                            .toList();
+                    break;
+                case EVENT_DATE:
+                default:
+                    sortedEvents = events.stream()
+                            .sorted(Comparator.comparing(Event::getEventDate))
+                            .toList();
+                    break;
+            }
+
+            List<EventShortDto> eventShortDtos = sortedEvents.stream()
+                    .map(eventEntity -> mapper.map(eventEntity, EventShortDto.class))
+                    .toList();
+
+            log.info("getEventsByParams for {} finished", parameters);
+            return eventShortDtos;
         }
-
-        List<EventShortDto> eventShortDtos = sortedEvents.stream()
-                .map(eventEntity -> mapper.map(eventEntity, EventShortDto.class))
-                .toList();
-
-        log.info("getEventsByParams for {} finished", parameters);
-        return eventShortDtos;
     }
 
 
@@ -194,11 +212,20 @@ public class EventServiceImpl implements EventService {
             eventFromRepository.setRequestModeration(event.getRequestModeration());
         }
         if (event.getStateAction() != null) {
-            eventFromRepository.setState(event.getStateAction().toEventState());
+            if (eventFromRepository.getState().equals(EventState.CANCELED)) {
+                throw new EventAlreadyCanceledException(String.
+                        format("Event %d already canceled", eventId));
+            } else if ((eventFromRepository.getState().equals(EventState.PUBLISHED))) {
+                throw new EventAlreadyCanceledException(String.
+                        format("Event %d already published", eventId));
+            } else {
+                eventFromRepository.setState(event.getStateAction().toEventState());
+            }
         }
         if (event.getTitle() != null) {
             eventFromRepository.setTitle(event.getTitle());
         }
+        eventFromRepository.setPublishedOn(LocalDateTime.now());
         Event savedEvent = eventRepository.save(eventFromRepository);
         EventFullDto result = mapper.map(savedEvent, EventFullDto.class);
         log.info("patchEvent for {} finished for {}", eventId, result);
@@ -239,7 +266,7 @@ public class EventServiceImpl implements EventService {
             location = createLocation(location);
         }
         event.setLocation(location);
-
+        event.setConfirmedRequests(0);
         log.info("event for save prepared {}", event);
         Event savedEvent = eventRepository.save(event);
         EventFullDto result = mapper.map(savedEvent, EventFullDto.class);
@@ -263,6 +290,10 @@ public class EventServiceImpl implements EventService {
         Event eventFromRepository = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event not found"));
 
+        if (eventFromRepository.getState().equals(EventState.PUBLISHED)) {
+            throw new EventAlreadyPublishedException(String
+                    .format("Event %d already published", eventId));
+        }
         if (event.getAnnotation() != null) {
             eventFromRepository.setAnnotation(event.getAnnotation());
         }
@@ -332,7 +363,8 @@ public class EventServiceImpl implements EventService {
             long eventId,
             EventRequestStatusUpdateRequest statusUpdateRequest) {
 
-        log.info("patchParticipationRequestOfCurrentUserEvents for {} started", eventId);
+        log.info("patchParticipationRequestOfCurrentUserEvents for event {} user {} requests {} started",
+                eventId, userId, statusUpdateRequest.getRequestIds());
         List<Request> requests = requestRepository.findAllById(statusUpdateRequest.getRequestIds());
 
         Event event = eventRepository.findById(eventId)
@@ -343,11 +375,43 @@ public class EventServiceImpl implements EventService {
                     .format("User %d not allowed to patch event %d", userId, eventId));
         }
 
-        if (statusUpdateRequest.getStatus() != null && statusUpdateRequest.getStatus().name().equals("CONFIRMED")) {
-            requests.forEach(request -> request.setStatus(ParticipationRequestStatus.CONFIRMED));
-        } else if (statusUpdateRequest.getStatus() != null && statusUpdateRequest.getStatus().name().equals("REJECTED")) {
-            requests.forEach(request -> request.setStatus(ParticipationRequestStatus.REJECTED));
+        AtomicInteger confirmedRequests = new AtomicInteger(event.getConfirmedRequests());
+
+        if (statusUpdateRequest.getStatus() != null && statusUpdateRequest.getStatus().equals(RequestStatus.CONFIRMED)) {
+            requests.forEach(request -> {
+                if (!event.getRequestModeration()) {
+                    if ((event.getParticipantLimit() < confirmedRequests.get() + requests.size())) {
+                        throw new RequestForLimitReachedEventException(String
+                                .format("Request for limit reached for event %d", eventId));
+                    }
+                    request.setStatus(ParticipationRequestStatus.CONFIRMED);
+                } else if (event.getParticipantLimit() == 0) {
+                    request.setStatus(ParticipationRequestStatus.CONFIRMED);
+                } else {
+                    if (event.getParticipantLimit() <= confirmedRequests.get()) {
+                        log.info("eventConfirmedRequests after LIMIT REACHED save request {}", confirmedRequests.get());
+
+                        log.info("LIMIT REACHED WHEN NO MODERATION AND NO PARTICIPANT LIMIT==0");
+                        throw new RequestForLimitReachedEventException(String
+                                .format("Request for limit reached for event %d", eventId));
+                    }
+                    request.setStatus(ParticipationRequestStatus.CONFIRMED);
+                    confirmedRequests.getAndIncrement();
+                    log.info("eventConfirmedRequests after save request {}", confirmedRequests.get());
+                }
+            });
+        } else if (statusUpdateRequest.getStatus() != null && statusUpdateRequest.getStatus().equals(RequestStatus.REJECTED)) {
+            requests.forEach(request -> {
+                if (request.getStatus().equals(ParticipationRequestStatus.CONFIRMED)) {
+                    throw new RequestAlreadyConfirmedException(String
+                            .format("Request %d already confirmed", request.getId()));
+                }
+                request.setStatus(ParticipationRequestStatus.REJECTED);
+            });
         }
+
+        event.setConfirmedRequests(event.getConfirmedRequests() + confirmedRequests.get());
+        eventRepository.save(event);
 
         requestRepository.saveAll(requests);
 
@@ -370,7 +434,10 @@ public class EventServiceImpl implements EventService {
                 .confirmedRequests(confirmedRequestsDto)
                 .rejectedRequests(rejectedRequestsDto)
                 .build();
-        log.info("patchParticipationRequestOfCurrentUserEvents for {} finished", eventId);
+
+        log.info("event after save: {}", event);
+        log.info("patchParticipationRequestOfCurrentUserEvents for event {} user {} requests {} finished",
+                eventId, userId, statusUpdateRequest.getRequestIds());
         return result;
     }
 
@@ -390,7 +457,14 @@ public class EventServiceImpl implements EventService {
             log.info("getPublishedEventFullInfo for {} finished", eventId);
             return mapper.map(event, EventFullDto.class);
         } else {
-            throw new PermissionDeniedException(String.format("User not allowed to get full info of event %d", eventId));
+            throw new EventNotFoundException(String
+                    .format("Event %d not found", eventId));
         }
+    }
+
+    public void setViews(long eventId, int views) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException(String.format("Event %d not found", eventId)));
+        event.setViews(views);
     }
 }

@@ -34,8 +34,8 @@ public class PrivateEventController {
 
     @GetMapping("/users/{userId}/events")
     public List<EventShortDto> getEventsByCurrentUser(@PathVariable long userId,
-                                                      @RequestParam(defaultValue = "0") int from,
-                                                      @RequestParam(defaultValue = "10") int size) {
+                                                      @RequestParam(required = false, defaultValue = "0") int from,
+                                                      @RequestParam(required = false, defaultValue = "10") int size) {
         log.info("getEventsByCurrentUser for {} started", userId);
         List<EventShortDto> eventShortDtos = eventService.getEventsByCurrentUser(userId, from, size);
         log.info("getEventsByCurrentUser for {} finished", eventShortDtos);
@@ -61,7 +61,7 @@ public class PrivateEventController {
 
     @PatchMapping("/users/{userId}/events/{eventId}")
     public EventFullDto patchEventOfCurrentUser(@PathVariable long userId, @PathVariable long eventId,
-                                                @RequestBody UpdateEventUserRequest updateEventDto) {
+                                                @RequestBody @Valid UpdateEventUserRequest updateEventDto) {
         log.info("patchEventOfCurrentUser for {} started", eventId);
         EventFullDto eventFullDto = eventService.patchEvent(userId, eventId, updateEventDto);
         log.info("patchEventOfCurrentUser for {} finished", eventFullDto);
@@ -82,7 +82,7 @@ public class PrivateEventController {
     public EventRequestStatusUpdateResult patchParticipationRequestOfCurrentUserEvents(
             @PathVariable long userId,
             @PathVariable long eventId,
-            @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest
+            @RequestBody @Valid EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest
     ) {
         log.info("patchParticipationRequestOfCurrentUser for {} started", eventId);
         EventRequestStatusUpdateResult eventRequestStatusUpdateResult = eventService

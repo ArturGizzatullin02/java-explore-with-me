@@ -36,25 +36,28 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto saveCompilation(NewCompilationDto compilationDto) {
         log.info("saveCompilation started for {}", compilationDto);
-
-        List<Long> eventIds = compilationDto.getEvents();
-        List<Event> events = eventRepository.findAllById(eventIds);
         Compilation compilation = mapper.map(compilationDto, Compilation.class);
-        compilation.setEvents(events);
-
+        List<Long> eventIds = compilationDto.getEvents();
+        if (eventIds != null && !eventIds.isEmpty()) {
+            List<Event> events = eventRepository.findAllById(eventIds);
+            compilation.setEvents(events);
+        }
         Compilation savedCompilation = compilationRepository.save(compilation);
-        List<EventShortDto> eventShortDtos = savedCompilation.getEvents().stream()
-                .map(event -> {
-                    User initiator = event.getInitiator();
-                    Category category = event.getCategory();
-                    EventShortDto eventShortDto = mapper.map(event, EventShortDto.class);
-                    eventShortDto.setInitiator(mapper.map(initiator, UserShortDto.class));
-                    eventShortDto.setCategory(mapper.map(category, CategoryDto.class));
-                    return eventShortDto;
-                })
-                .toList();
         CompilationDto savedCompilationDto = mapper.map(savedCompilation, CompilationDto.class);
-        savedCompilationDto.setEvents(eventShortDtos);
+
+        if (eventIds != null && !eventIds.isEmpty()) {
+            List<EventShortDto> eventShortDtos = savedCompilation.getEvents().stream()
+                    .map(event -> {
+                        User initiator = event.getInitiator();
+                        Category category = event.getCategory();
+                        EventShortDto eventShortDto = mapper.map(event, EventShortDto.class);
+                        eventShortDto.setInitiator(mapper.map(initiator, UserShortDto.class));
+                        eventShortDto.setCategory(mapper.map(category, CategoryDto.class));
+                        return eventShortDto;
+                    })
+                    .toList();
+            savedCompilationDto.setEvents(eventShortDtos);
+        }
         log.info("saveCompilation finished for {}", savedCompilationDto);
         return savedCompilationDto;
     }
@@ -101,9 +104,11 @@ public class CompilationServiceImpl implements CompilationService {
     public List<CompilationDto> getCompilations(Boolean pinned, int from, int size) {
         PageRequest page = PageRequest.of(from / size, size);
         Page<Compilation> compilations = compilationRepository.findAllByPinned(pinned, page);
+
         List<CompilationDto> compilationDtos = compilations.stream()
                 .map(compilation -> mapper.map(compilation, CompilationDto.class))
                 .toList();
+
         log.info("getCompilations finished for {}", compilationDtos);
         return compilationDtos;
     }

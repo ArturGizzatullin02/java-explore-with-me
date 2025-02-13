@@ -33,9 +33,9 @@ public class PrivateRequestController {
     @PostMapping("/users/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto createRequest(@PathVariable long userId, @RequestParam long eventId) {
-        log.info("createRequest for {} {} started", userId, eventId);
+        log.info("createRequest for user {} and event {} started", userId, eventId);
         ParticipationRequestDto participationRequestDto = requestService.saveRequestOfCurrentUser(userId, eventId);
-        log.info("createRequest for {} {} finished", userId, participationRequestDto);
+        log.info("createRequest for user {} and event {} finished, requestId {}", userId, eventId, participationRequestDto);
         return participationRequestDto;
     }
 
