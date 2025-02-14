@@ -1,62 +1,92 @@
 package ru.practicum;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+import ru.practicum.HitsDto;
+import ru.practicum.PostHitsDto;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.List;
 
-@Slf4j
-@Service
 public class StatsClient {
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String BASE_URL = "http://localhost:9090";
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private final RestClient restClient;
-
-    @Value(value = "${STATS_CLIENT_BASE_URL}")
-    private String baseUrl;
+    private final RestTemplate restTemplate;
 
     public StatsClient() {
-        this.restClient = RestClient.builder()
-                .baseUrl(baseUrl)
-                .build();
+        this.restTemplate = new RestTemplate();
     }
 
-    private static final String APPLICATION_NAME = "stats-service";
-
-    public ResponseEntity<Void> hit(String uri, String ip) {
+    /**
+     * Отправка данных о хите.
+     *
+     * @param app Имя приложения.
+     * @param uri URI, для которого регистрируется hit (передаётся внешним сервисом).
+     * @param ip  IP-адрес клиента (передаётся внешним сервисом).
+     */
+    public void sendHit(String app, String uri, String ip) {
+        // Формируем DTO, используя полученные от внешнего сервиса данные.
         PostHitsDto postHitsDto = PostHitsDto.builder()
-                .app(APPLICATION_NAME)
+                .app(app)
                 .uri(uri)
                 .ip(ip)
+                // Текущее время форматируем согласно паттерну контроллера
+                .timestamp(LocalDateTime.now().format(FORMATTER))
                 .build();
 
-        return restClient.post()
-                .uri("/hit")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(postHitsDto)
-                .retrieve()
-                .toBodilessEntity();
+        ResponseEntity<Void> response = restTemplate.postForEntity(BASE_URL + "/hit", postHitsDto, Void.class);
+        System.out.println("POST /hit response status: " + response.getStatusCode());
     }
 
-    public ResponseEntity<String> getStats(GetHitsRequestParametersDto dto) {
-        String start = URLEncoder.encode(dto.getStart().format(formatter), StandardCharsets.UTF_8);
-        String end = URLEncoder.encode(dto.getEnd().format(formatter), StandardCharsets.UTF_8);
+    /**
+     * Получение статистики.
+     *
+     * @param start  Начало временного интервала.
+     * @param end    Конец временного интервала.
+     * @param uris   Список URI для фильтрации (опционально, может быть null).
+     * @param unique Флаг для выборки уникальных значений (опционально, может быть null).
+     * @return Список статистических данных.
+     */
+    public List<HitsDto> getStats(LocalDateTime start, LocalDateTime end, Collection<String> uris, Boolean unique) {
+        // Формируем URL с обязательными параметрами start и end.
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/stats")
+                .queryParam("start", start.format(FORMATTER))
+                .queryParam("end", end.format(FORMATTER));
 
-        return restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("start", start)
-                        .queryParam("end", end)
-                        .queryParam("uris", dto.getUris())
-                        .queryParam("unique", dto.isUnique())
-                        .build())
-                .retrieve()
-                .toEntity(String.class);
+        // Если список uris передан, добавляем его в параметры запроса.
+        if (uris != null && !uris.isEmpty()) {
+            for (String uri : uris) {
+                builder.queryParam("uris", uri);
+            }
+        }
+
+        // Добавляем параметр unique, если он не null.
+        if (unique != null) {
+            builder.queryParam("unique", unique);
+        }
+
+        String url = builder.toUriString();
+
+        ResponseEntity<List<HitsDto>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<List<HitsDto>>() {
+                }
+        );
+
+        List<HitsDto> stats = response.getBody();
+        if (stats != null) {
+            stats.forEach(System.out::println);
+        }
+        return stats;
     }
 }

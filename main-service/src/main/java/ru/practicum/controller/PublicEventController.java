@@ -75,16 +75,17 @@ public class PublicEventController {
         log.info("getEvents for {} started", parameters);
         List<EventShortDto> eventShortDtos = eventService.getEventsShortDtoByParams(parameters);
 
-//        statsClient.hit(request.getRequestURI(), request.getRemoteAddr());
+        statsClient.sendHit("EWM-MAIN-SERVICE", request.getRequestURI(), request.getRemoteAddr());
 
         log.info("getEvents for {} finished", parameters);
         return eventShortDtos;
     }
 
     @GetMapping("/events/{eventId}")
-    public EventFullDto getPublishedEventFullInfo(@PathVariable long eventId) {
+    public EventFullDto getPublishedEventFullInfo(@PathVariable long eventId, HttpServletRequest request) {
         log.info("getEvent for {} started", eventId);
         EventFullDto eventFullDto = eventService.getPublishedEventFullInfo(eventId);
+        statsClient.sendHit("EWM-MAIN-SERVICE", request.getRequestURI(), request.getRemoteAddr());
         log.info("getEvent for {} finished", eventId);
         return eventFullDto;
     }
