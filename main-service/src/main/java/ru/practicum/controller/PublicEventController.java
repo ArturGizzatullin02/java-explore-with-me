@@ -6,22 +6,24 @@ import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.GetHitsRequestParametersDto;
+import ru.practicum.HitsDto;
 import ru.practicum.StatsClient;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.EventShortDto;
 import ru.practicum.dto.GetEventParametersUserRequest;
 import ru.practicum.model.EventSort;
+import ru.practicum.repository.EventRepository;
 import ru.practicum.service.EventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @Slf4j
@@ -46,14 +48,6 @@ public class PublicEventController {
                                                  @RequestParam(required = false, defaultValue = "0") int from,
                                                  @RequestParam(required = false, defaultValue = "10") int size,
                                                  HttpServletRequest request) {
-
-//        GetHitsRequestParametersDto hitParameters = GetHitsRequestParametersDto.builder()
-//                .start()
-//                .end()
-//                .uris(List.of(request.getRequestURI()))
-//                .build();
-
-//        ResponseEntity<String> stats = statsClient.getStats(hitParameters);
 
         GetEventParametersUserRequest parameters = GetEventParametersUserRequest.builder()
                 .text(text)
@@ -85,7 +79,28 @@ public class PublicEventController {
     public EventFullDto getPublishedEventFullInfo(@PathVariable long eventId, HttpServletRequest request) {
         log.info("getEvent for {} started", eventId);
         EventFullDto eventFullDto = eventService.getPublishedEventFullInfo(eventId);
+
+        GetHitsRequestParametersDto parameters = GetHitsRequestParametersDto.builder()
+                .start(eventFullDto.getPublishedOn())
+                .end(LocalDateTime.now())
+                .uris(List.of(request.getRequestURI()))
+                .unique(false)
+                .build();
+
+        log.info("Starting getStats for parameters {}", parameters);
+        List<HitsDto> hitsDtos = statsClient.getStats(parameters);
+        log.info("Finished getStats for parameters {} with result {}", parameters, hitsDtos);
+
+        HitsDto hitsDto = hitsDtos.stream().findFirst().orElse(HitsDto.builder().build());
+        eventFullDto.setViews(hitsDto.getHits());
+
+        log.info("Starting increaseViews for eventId {}", eventId);
+        eventService.increaseViews(eventId, hitsDto.getHits());
+        log.info("Finished increaseViews for eventId {}", eventId);
+
+        log.info("Starting sendHit for eventId {}", eventId);
         statsClient.sendHit("EWM-MAIN-SERVICE", request.getRequestURI(), request.getRemoteAddr());
+        log.info("Finished sendHit for eventId {}", eventId);
         log.info("getEvent for {} finished", eventId);
         return eventFullDto;
     }

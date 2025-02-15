@@ -41,7 +41,7 @@ public class HitsServiceImpl implements HitsService {
         Collection<HitsDto> hitsDto;
         if (uris == null || uris.isEmpty()) {
             hits = hitsRepository.findAllByTimestampBetween(start, end);
-        } else if (unique) {
+        } else if (unique) { // TODO проверить, unique не работает, возвращает все, а не unique(тест на сервис статистики)
             hits = hitsRepository.findAllByTimestampBetweenAndUriIn(start, end, uris);
             hits = new ArrayList<>(hits.stream()
                     .collect(Collectors.toMap(Hits::getIp, hit -> hit, (existing, replacement) -> existing))

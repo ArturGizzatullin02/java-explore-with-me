@@ -20,10 +20,7 @@ import ru.practicum.model.EventState;
 import ru.practicum.service.EventService;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -54,10 +51,10 @@ public class AdminEventController {
                 .size(size)
                 .build();
 
-//        var violations = validator.validate(parameters);
-//        if (!violations.isEmpty()) {
-//            throw new ConstraintViolationException(violations);
-//        }
+        var violations = validator.validate(parameters);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
 
         log.info("getEvents for {} started", parameters);
         List<EventFullDto> eventFullDtos = eventService.getEventsByParams(parameters);

@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Collection<UserDto> getUsers(List<Long> ids, int from, int size) {
         log.info("getUsers for {} started", ids);
-        PageRequest page = PageRequest.of(from / size , size);
+        PageRequest page = PageRequest.of(from / size, size);
         if (ids == null || ids.isEmpty()) {
             Page<User> users = userRepository.findAll(page);
             List<UserDto> userDtos = users.stream()

@@ -38,4 +38,6 @@ public interface EventService {
     );
 
     EventFullDto getPublishedEventFullInfo(long eventId);
+
+    void increaseViews(long eventId, int views);
 }

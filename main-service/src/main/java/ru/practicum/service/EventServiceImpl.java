@@ -462,9 +462,11 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    public void setViews(long eventId, int views) {
+    @Override
+    public void increaseViews(long eventId, int views) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(String.format("Event %d not found", eventId)));
         event.setViews(views);
+        eventRepository.save(event);
     }
 }

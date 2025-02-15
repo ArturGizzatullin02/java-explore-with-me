@@ -11,7 +11,6 @@ import ru.practicum.dto.NewCategoryDto;
 import ru.practicum.exception.CategoryAlreadyExistsException;
 import ru.practicum.exception.CategoryNotFoundException;
 import ru.practicum.exception.DeleteCategoryWithEventsException;
-import ru.practicum.exception.PermissionDeniedException;
 import ru.practicum.model.Category;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
