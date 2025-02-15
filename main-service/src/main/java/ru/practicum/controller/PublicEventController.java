@@ -85,6 +85,11 @@ public class PublicEventController {
                 .unique(true)
                 .build();
 
+        var violations = validator.validate(parameters);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
         log.info("Starting getStats for parameters {}", parameters);
         List<HitsDto> hitsDtos = statsClient.getStats(parameters);
         log.info("Finished getStats for parameters {} with result {}", parameters, hitsDtos);
