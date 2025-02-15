@@ -213,11 +213,11 @@ public class EventServiceImpl implements EventService {
         }
         if (event.getStateAction() != null) {
             if (eventFromRepository.getState().equals(EventState.CANCELED)) {
-                throw new EventAlreadyCanceledException(String.
-                        format("Event %d already canceled", eventId));
+                throw new EventAlreadyCanceledException(String
+                        .format("Event %d already canceled", eventId));
             } else if ((eventFromRepository.getState().equals(EventState.PUBLISHED))) {
-                throw new EventAlreadyCanceledException(String.
-                        format("Event %d already published", eventId));
+                throw new EventAlreadyCanceledException(String
+                        .format("Event %d already published", eventId));
             } else {
                 eventFromRepository.setState(event.getStateAction().toEventState());
             }

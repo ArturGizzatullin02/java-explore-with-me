@@ -92,8 +92,8 @@ public class RequestServiceImpl implements RequestService {
         }
 
         if (requestRepository.existsByRequesterAndEvent(userId, eventId)) {
-            throw new RequestAlreadyExistsException(String.
-                    format("Request by requester %d for event %d already exists", userId, eventId));
+            throw new RequestAlreadyExistsException(String
+                    .format("Request by requester %d for event %d already exists", userId, eventId));
         }
 
         if (event.getInitiator().getId() == userId) {
