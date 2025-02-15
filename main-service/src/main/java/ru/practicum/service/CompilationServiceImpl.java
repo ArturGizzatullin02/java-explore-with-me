@@ -6,6 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.EventShortDto;
@@ -34,6 +35,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final ModelMapper mapper;
 
     @Override
+    @Transactional
     public CompilationDto saveCompilation(NewCompilationDto compilationDto) {
         log.info("saveCompilation started for {}", compilationDto);
         Compilation compilation = mapper.map(compilationDto, Compilation.class);
@@ -70,6 +72,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public CompilationDto patchCompilation(long compId, UpdateCompilationRequest updateCompilationRequest) {
         Compilation compilationFromRepository = compilationRepository.findById(compId)
                 .orElseThrow(() -> new CompilationNotFoundException(String.format("Compilation %d not found", compId)));

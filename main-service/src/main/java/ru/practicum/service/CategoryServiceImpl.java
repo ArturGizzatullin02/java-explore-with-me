@@ -6,6 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.NewCategoryDto;
 import ru.practicum.exception.CategoryAlreadyExistsException;
@@ -29,6 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final ModelMapper mapper;
 
     @Override
+    @Transactional
     public CategoryDto saveCategory(NewCategoryDto newCategoryDto) {
         log.info("createCategory for {} started", newCategoryDto);
         Category category = mapper.map(newCategoryDto, Category.class);
@@ -57,6 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDto patchCategory(long catId, NewCategoryDto newCategoryDto) {
         log.info("patchCategory for {} {} started", catId, newCategoryDto);
         Category categoryForUpdate = mapper.map(newCategoryDto, Category.class);

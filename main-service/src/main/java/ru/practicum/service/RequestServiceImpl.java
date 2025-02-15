@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.exception.EventNotFoundException;
 import ru.practicum.exception.RequestAlreadyConfirmedException;
@@ -27,6 +28,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class RequestServiceImpl implements RequestService {
 
     private final RequestRepository requestRepository;
@@ -38,6 +40,7 @@ public class RequestServiceImpl implements RequestService {
     private final ModelMapper mapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<ParticipationRequestDto> getRequestsOfCurrentUser(long userId) {
         log.info("getRequestsOfCurrentUser for {} started", userId);
         userRepository.findById(userId)

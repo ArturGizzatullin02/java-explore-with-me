@@ -65,7 +65,6 @@ public class EventServiceImpl implements EventService {
     private final ModelMapper mapper;
 
     @Override
-    @Transactional
     public List<EventFullDto> getEventsByParams(GetEventParametersAdminRequest parameters) {
         log.info("getEventsByParams for {} started", parameters);
         PageRequest page = PageRequest.of(parameters.getFrom() / parameters.getSize(), parameters.getSize());
@@ -101,6 +100,7 @@ public class EventServiceImpl implements EventService {
         return eventFullDtos;
     }
 
+    @Override
     public List<EventShortDto> getEventsShortDtoByParams(GetEventParametersUserRequest parameters) {
         log.info("getEventsByParams for {} started", parameters);
         PageRequest page = PageRequest.of(parameters.getFrom() / parameters.getSize(), parameters.getSize());
@@ -174,6 +174,7 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
+    @Transactional
     public EventFullDto patchEvent(long eventId, UpdateEventAdminRequest event) {
         log.info("patchEvent for {} started for {}", eventId, event);
         Event eventFromRepository = eventRepository.findById(eventId)
@@ -245,6 +246,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto saveEvent(long userId, NewEventDto eventDto) {
         log.info("saveEvent for {} for user {} started", eventDto, userId);
         Event event = mapper.map(eventDto, Event.class);
@@ -285,6 +287,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto patchEvent(long userId, long eventId, UpdateEventUserRequest event) {
         log.info("patchEvent for {} started for {}", eventId, event);
         Event eventFromRepository = eventRepository.findById(eventId)
@@ -339,6 +342,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ParticipationRequestDto> getParticipationRequestsByCurrentUserEvents(long userId, long eventId) {
         log.info("getParticipationRequestsByCurrentUserEvents for {} started", eventId);
         Event event = eventRepository.findById(eventId)
@@ -358,6 +362,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventRequestStatusUpdateResult patchParticipationRequestOfCurrentUserEvents(
             long userId,
             long eventId,
