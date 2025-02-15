@@ -18,12 +18,10 @@ import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.EventShortDto;
 import ru.practicum.dto.GetEventParametersUserRequest;
 import ru.practicum.model.EventSort;
-import ru.practicum.repository.EventRepository;
 import ru.practicum.service.EventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @Slf4j
@@ -81,10 +79,10 @@ public class PublicEventController {
         EventFullDto eventFullDto = eventService.getPublishedEventFullInfo(eventId);
 
         GetHitsRequestParametersDto parameters = GetHitsRequestParametersDto.builder()
-                .start(eventFullDto.getPublishedOn())
-                .end(LocalDateTime.now())
+                .start(eventFullDto.getPublishedOn().minusSeconds(1))
+                .end(LocalDateTime.now().plusSeconds(1))
                 .uris(List.of(request.getRequestURI()))
-                .unique(false)
+                .unique(true)
                 .build();
 
         log.info("Starting getStats for parameters {}", parameters);
@@ -94,9 +92,9 @@ public class PublicEventController {
         HitsDto hitsDto = hitsDtos.stream().findFirst().orElse(HitsDto.builder().build());
         eventFullDto.setViews(hitsDto.getHits());
 
-        log.info("Starting increaseViews for eventId {}", eventId);
-        eventService.increaseViews(eventId, hitsDto.getHits());
-        log.info("Finished increaseViews for eventId {}", eventId);
+        log.info("Starting setViews for eventId {}", eventId);
+        eventService.setViews(eventId, hitsDto.getHits());
+        log.info("Finished setViews for eventId {}", eventId);
 
         log.info("Starting sendHit for eventId {}", eventId);
         statsClient.sendHit("EWM-MAIN-SERVICE", request.getRequestURI(), request.getRemoteAddr());

@@ -1,6 +1,7 @@
 package ru.practicum;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -10,8 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -21,14 +20,16 @@ import java.util.List;
 @Component
 public class StatsClient {
 
-    @Value("${STATS_CLIENT_BASE_URL}")
-    private static String BASE_URL;
+    private final String baseUrl;
+
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     private final RestTemplate restTemplate;
 
-    public StatsClient() {
-        this.restTemplate = new RestTemplate();
+    @Autowired
+    public StatsClient(RestTemplate restTemplate, @Value("${STATS_CLIENT_BASE_URL}") String baseUrl) {
+        this.restTemplate = restTemplate;
+        this.baseUrl = baseUrl;
     }
 
     public void sendHit(String app, String uri, String ip) {
@@ -39,13 +40,13 @@ public class StatsClient {
                 .timestamp(LocalDateTime.now().format(FORMATTER))
                 .build();
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(BASE_URL + "/hit", postHitsDto, Void.class);
+        ResponseEntity<Void> response = restTemplate.postForEntity(baseUrl + "/hit", postHitsDto, Void.class);
         System.out.println("POST /hit response status: " + response.getStatusCode());
     }
 
     public List<HitsDto> getStats(GetHitsRequestParametersDto parameters) {
         log.info("Start get stats for parameters {}", parameters);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/stats")
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/stats")
                 .queryParam("start", parameters.getStart().format(FORMATTER))
                 .queryParam("end", parameters.getEnd().format(FORMATTER));
 

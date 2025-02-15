@@ -36,12 +36,12 @@ public class HitsServiceImpl implements HitsService {
 
     @Override
     public Collection<HitsDto> getHits(LocalDateTime start, LocalDateTime end, Collection<String> uris, boolean unique) {
-        log.info("getHits for {} started from {} to {}", uris, start, end);
+        log.info("started getHits with unique {} for {} from {} to {}", unique, uris, start, end);
         Collection<Hits> hits;
         Collection<HitsDto> hitsDto;
         if (uris == null || uris.isEmpty()) {
             hits = hitsRepository.findAllByTimestampBetween(start, end);
-        } else if (unique) { // TODO проверить, unique не работает, возвращает все, а не unique(тест на сервис статистики)
+        } else if (unique) {
             hits = hitsRepository.findAllByTimestampBetweenAndUriIn(start, end, uris);
             hits = new ArrayList<>(hits.stream()
                     .collect(Collectors.toMap(Hits::getIp, hit -> hit, (existing, replacement) -> existing))
