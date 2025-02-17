@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import ru.practicum.GetHitsRequestParametersDto;
 import ru.practicum.HitsDto;
 import ru.practicum.PostHitsDto;
 import ru.practicum.model.Hits;
@@ -35,8 +36,14 @@ public class HitsServiceImpl implements HitsService {
     }
 
     @Override
-    public Collection<HitsDto> getHits(LocalDateTime start, LocalDateTime end, Collection<String> uris, boolean unique) {
-        log.info("getHits for {} started from {} to {}", uris, start, end);
+    public Collection<HitsDto> getHits(GetHitsRequestParametersDto parameters) {
+
+        boolean unique = parameters.isUnique();
+        Collection<String> uris = parameters.getUris();
+        LocalDateTime start = parameters.getStart();
+        LocalDateTime end = parameters.getEnd();
+
+        log.info("started getHits with unique {} for {} from {} to {}", unique, uris, start, end);
         Collection<Hits> hits;
         Collection<HitsDto> hitsDto;
         if (uris == null || uris.isEmpty()) {
