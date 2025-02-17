@@ -125,6 +125,45 @@ public class EventServiceImpl implements EventService {
 
         Page<Event> events = eventRepository.findAll(predicate, page);
 
+        Map<Long, Integer> viewsMapByIds = getStatsByEvents(events);
+
+        List<EventShortDto> eventShortDtos = events.stream()
+                .map(eventEntity -> {
+                    EventShortDto eventDto = mapper.map(eventEntity, EventShortDto.class);
+                    eventDto.setViews(viewsMapByIds.getOrDefault(eventDto.getId(), 0));
+                    return eventDto;
+                })
+                .toList();
+
+        if (parameters.getSort() == null) {
+            log.info("getEventsShortDtosByParams for {} finished with sort == null", parameters);
+            return eventShortDtos;
+        } else {
+            List<EventShortDto> sortedEventShortDtos = getSortedEventShortDtos(parameters, eventShortDtos);
+            log.info("getEventsShortDtosByParams for {} finished with sort != null", parameters);
+            return sortedEventShortDtos;
+        }
+    }
+
+    private static List<EventShortDto> getSortedEventShortDtos(GetEventParametersUserRequest parameters, List<EventShortDto> eventShortDtos) {
+        List<EventShortDto> sortedEventShortDtos;
+        switch (parameters.getSort()) {
+            case VIEWS:
+                sortedEventShortDtos = eventShortDtos.stream()
+                        .sorted((e1, e2) -> e2.getViews().compareTo(e1.getViews()))
+                        .toList();
+                break;
+            case EVENT_DATE:
+            default:
+                sortedEventShortDtos = eventShortDtos.stream()
+                        .sorted(Comparator.comparing(EventShortDto::getEventDate))
+                        .toList();
+                break;
+        }
+        return sortedEventShortDtos;
+    }
+
+    private Map<Long, Integer> getStatsByEvents(Page<Event> events) {
         List<String> eventUris = events.getContent().stream()
                 .map(eventEntity -> "/events/" + eventEntity.getId())
                 .toList();
@@ -143,43 +182,12 @@ public class EventServiceImpl implements EventService {
 
         List<HitsDto> hitsDtos = statsClient.getStats(getStatsParameters);
 
-        Map<Long, Integer> viewsMapByIds = hitsDtos.stream()
+        return hitsDtos.stream()
                 .collect(Collectors.toMap(
                         hit -> Long.parseLong(hit.getUri().substring("/events/".length())),
                         HitsDto::getHits,
                         (existing, replacement) -> existing
                 ));
-
-        List<EventShortDto> eventShortDtos = events.stream()
-                .map(eventEntity -> {
-                    EventShortDto eventDto = mapper.map(eventEntity, EventShortDto.class);
-                    eventDto.setViews(viewsMapByIds.getOrDefault(eventDto.getId(), 0));
-                    return eventDto;
-                })
-                .toList();
-
-        if (parameters.getSort() == null) {
-            log.info("getEventsShortDtosByParams for {} finished with sort == null", parameters);
-            return eventShortDtos;
-        } else {
-            List<EventShortDto> sortedEventShortDtos;
-            switch (parameters.getSort()) {
-                case VIEWS:
-                    sortedEventShortDtos = eventShortDtos.stream()
-                            .sorted((e1, e2) -> e2.getViews().compareTo(e1.getViews()))
-                            .toList();
-                    break;
-                case EVENT_DATE:
-                default:
-                    sortedEventShortDtos = eventShortDtos.stream()
-                            .sorted(Comparator.comparing(EventShortDto::getEventDate))
-                            .toList();
-                    break;
-            }
-
-            log.info("getEventsShortDtosByParams for {} finished with sort != null", parameters);
-            return sortedEventShortDtos;
-        }
     }
 
     private BooleanBuilder buildBaseGetEventPredicate(GetEventParametersBaseRequest parameters) {
