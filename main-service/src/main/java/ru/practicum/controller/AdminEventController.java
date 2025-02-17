@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.dto.EventFullDto;
@@ -26,13 +27,14 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@RequestMapping("/admin/events")
 public class AdminEventController {
 
     private final EventService eventService;
 
     private final Validator validator;
 
-    @GetMapping("/admin/events")
+    @GetMapping
     public List<EventFullDto> getEventsByParams(@RequestParam(required = false) List<Long> users,
                                                 @RequestParam(required = false) List<EventState> states,
                                                 @RequestParam(required = false) List<Long> categories,
@@ -62,11 +64,11 @@ public class AdminEventController {
         return eventFullDtos;
     }
 
-    @PatchMapping("/admin/events/{eventId}")
-    public EventFullDto patchEvent(@PathVariable long eventId, @RequestBody @Valid UpdateEventAdminRequest event) {
-        log.info("patchEvent for {} and {} started", eventId, event);
-        EventFullDto eventFullDto = eventService.patchEvent(eventId, event);
-        log.info("patchEvent for {} and {} finished", eventFullDto.getId(), eventFullDto);
+    @PatchMapping("/{eventId}")
+    public EventFullDto editEvent(@PathVariable long eventId, @RequestBody @Valid UpdateEventAdminRequest event) {
+        log.info("editEvent for {} and {} started", eventId, event);
+        EventFullDto eventFullDto = eventService.editEvent(eventId, event);
+        log.info("editEvent for {} and {} finished", eventFullDto.getId(), eventFullDto);
         return eventFullDto;
     }
 }

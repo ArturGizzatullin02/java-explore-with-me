@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import ru.practicum.validator.StartBeforeEndConstraint;
+import ru.practicum.validator.StartBeforeEndHitRequestConstraint;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.Collection;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-@StartBeforeEndConstraint
+@StartBeforeEndHitRequestConstraint
 public class GetHitsRequestParametersDto {
 
     @NotNull(message = "Стартовое время поиска не может быть null")

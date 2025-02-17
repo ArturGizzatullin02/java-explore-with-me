@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.dto.CategoryDto;
@@ -20,11 +21,12 @@ import ru.practicum.service.CategoryService;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@RequestMapping("/admin/categories")
 public class AdminCategoryController {
 
     private final CategoryService categoryService;
 
-    @PostMapping("/admin/categories")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto createCategory(@RequestBody @Valid NewCategoryDto newCategoryDto) {
         log.info("createCategory for {} started", newCategoryDto);
@@ -33,7 +35,7 @@ public class AdminCategoryController {
         return categoryDto;
     }
 
-    @DeleteMapping("/admin/categories/{catId}")
+    @DeleteMapping("/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable long catId) {
         log.info("deleteCategory for {} started", catId);
@@ -41,11 +43,11 @@ public class AdminCategoryController {
         log.info("deleteCategory for {} finished", catId);
     }
 
-    @PatchMapping("/admin/categories/{catId}")
-    public CategoryDto patchCategory(@PathVariable long catId, @RequestBody @Valid NewCategoryDto newCategoryDto) {
-        log.info("patchCategory for {} {} started", catId, newCategoryDto);
-        CategoryDto categoryDto = categoryService.patchCategory(catId, newCategoryDto);
-        log.info("patchCategory for {} {} finished", catId, categoryDto);
+    @PatchMapping("/{catId}")
+    public CategoryDto editCategory(@PathVariable long catId, @RequestBody @Valid NewCategoryDto newCategoryDto) {
+        log.info("editCategory for {} {} started", catId, newCategoryDto);
+        CategoryDto categoryDto = categoryService.editCategory(catId, newCategoryDto);
+        log.info("editCategory for {} {} finished", catId, categoryDto);
         return categoryDto;
     }
 }

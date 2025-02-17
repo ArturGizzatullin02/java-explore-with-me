@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.GetHitsRequestParametersDto;
@@ -27,6 +28,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@RequestMapping("/events")
 public class PublicEventController {
 
     private final EventService eventService;
@@ -35,7 +37,7 @@ public class PublicEventController {
 
     private final StatsClient statsClient;
 
-    @GetMapping("/events")
+    @GetMapping
     public List<EventShortDto> getEventsByParams(@RequestParam(required = false) String text,
                                                  @RequestParam(required = false) List<Long> categories,
                                                  @RequestParam(required = false) Boolean paid,
@@ -63,17 +65,15 @@ public class PublicEventController {
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
-
         log.info("getEvents for {} started", parameters);
         List<EventShortDto> eventShortDtos = eventService.getEventsShortDtoByParams(parameters);
-
         statsClient.sendHit("EWM-MAIN-SERVICE", request.getRequestURI(), request.getRemoteAddr());
 
         log.info("getEvents for {} finished", parameters);
         return eventShortDtos;
     }
 
-    @GetMapping("/events/{eventId}")
+    @GetMapping("/{eventId}")
     public EventFullDto getPublishedEventFullInfo(@PathVariable long eventId, HttpServletRequest request) {
         log.info("getEvent for {} started", eventId);
         EventFullDto eventFullDto = eventService.getPublishedEventFullInfo(eventId);
@@ -96,10 +96,6 @@ public class PublicEventController {
 
         HitsDto hitsDto = hitsDtos.stream().findFirst().orElse(HitsDto.builder().build());
         eventFullDto.setViews(hitsDto.getHits());
-
-        log.info("Starting setViews for eventId {}", eventId);
-        eventService.setViews(eventId, hitsDto.getHits());
-        log.info("Finished setViews for eventId {}", eventId);
 
         log.info("Starting sendHit for eventId {}", eventId);
         statsClient.sendHit("EWM-MAIN-SERVICE", request.getRequestURI(), request.getRemoteAddr());

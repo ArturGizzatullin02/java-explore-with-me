@@ -10,10 +10,10 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Constraint(validatedBy = StartBeforeEndUserValidator.class)
-public @interface StartBeforeEndUserConstraint {
+@Constraint(validatedBy = StartBeforeEndHitRequestValidator.class)
+public @interface StartBeforeEndHitRequestConstraint {
 
-    String message() default "Стартовое время должно быть раньше конечного";
+    String message() default "Стартовое время должно быть раньше конечного, при этом они оба не null";
 
     Class<?>[] groups() default {};
 

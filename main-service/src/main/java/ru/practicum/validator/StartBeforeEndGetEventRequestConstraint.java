@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Constraint(validatedBy = StartBeforeEndAdminValidator.class)
-public @interface StartBeforeEndAdminConstraint {
+@Constraint(validatedBy = StartBeforeEndGetEventRequestValidator.class)
+public @interface StartBeforeEndGetEventRequestConstraint {
 
     String message() default "Стартовое время должно быть раньше конечного, при этом они оба не null";
 

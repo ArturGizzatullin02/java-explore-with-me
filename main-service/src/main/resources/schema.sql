@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS events
     initiator_id       BIGINT        NOT NULL,
     published_on       TIMESTAMP,
     state              VARCHAR(9)    NOT NULL,
-    views              INT,
 
     CONSTRAINT fk_category_id FOREIGN KEY (category_id) REFERENCES categories (category_id) ON DELETE SET NULL,
     CONSTRAINT fk_location_id FOREIGN KEY (location_id) REFERENCES locations (location_id) ON DELETE SET NULL

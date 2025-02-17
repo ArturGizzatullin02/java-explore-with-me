@@ -19,7 +19,7 @@ public interface EventService {
 
     List<EventShortDto> getEventsShortDtoByParams(GetEventParametersUserRequest parameters);
 
-    EventFullDto patchEvent(long eventId, UpdateEventAdminRequest event);
+    EventFullDto editEvent(long eventId, UpdateEventAdminRequest event);
 
     List<EventShortDto> getEventsByCurrentUser(long userId, int from, int size);
 
@@ -27,7 +27,7 @@ public interface EventService {
 
     EventFullDto getEventFullInfoByCurrentUser(long userId, long eventId);
 
-    EventFullDto patchEvent(long userId, long eventId, UpdateEventUserRequest event);
+    EventFullDto editEvent(long userId, long eventId, UpdateEventUserRequest event);
 
     List<ParticipationRequestDto> getParticipationRequestsByCurrentUserEvents(long userId, long eventId);
 
@@ -38,6 +38,4 @@ public interface EventService {
     );
 
     EventFullDto getPublishedEventFullInfo(long eventId);
-
-    void setViews(long eventId, int views);
 }

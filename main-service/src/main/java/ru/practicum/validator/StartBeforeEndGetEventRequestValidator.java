@@ -2,14 +2,14 @@ package ru.practicum.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import ru.practicum.dto.GetEventParametersUserRequest;
+import ru.practicum.dto.GetEventParametersBaseRequest;
 
 import java.time.LocalDateTime;
 
-public class StartBeforeEndUserValidator implements ConstraintValidator<StartBeforeEndUserConstraint, GetEventParametersUserRequest> {
+public class StartBeforeEndGetEventRequestValidator implements ConstraintValidator<StartBeforeEndGetEventRequestConstraint, GetEventParametersBaseRequest> {
 
     @Override
-    public boolean isValid(GetEventParametersUserRequest parameters, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(GetEventParametersBaseRequest parameters, ConstraintValidatorContext context) {
         if (parameters == null) {
             return true;
         }
@@ -22,9 +22,7 @@ public class StartBeforeEndUserValidator implements ConstraintValidator<StartBef
                 return false;
             }
             return start.isBefore(end);
-        } else {
-            return true;
         }
+        return true;
     }
 }
-

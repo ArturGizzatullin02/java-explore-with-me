@@ -60,8 +60,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto patchCategory(long catId, NewCategoryDto newCategoryDto) {
-        log.info("patchCategory for {} {} started", catId, newCategoryDto);
+    public CategoryDto editCategory(long catId, NewCategoryDto newCategoryDto) {
+        log.info("editCategory for {} {} started", catId, newCategoryDto);
         Category categoryForUpdate = mapper.map(newCategoryDto, Category.class);
         Category categoryFromRepository = categoryRepository.findById(catId)
                 .orElseThrow(() -> new CategoryNotFoundException(String.format("Category with id %d not found", catId)));
@@ -73,14 +73,14 @@ public class CategoryServiceImpl implements CategoryService {
         } else if (!categoryRepository.existsByName(categoryForUpdate.getName())
                 || categoryForUpdate.getName().equals(categoryFromRepository.getName())) {
             categoryRepository.save(categoryForUpdate);
-            log.info("patchCategory for {} {} finished", catId, categoryForUpdate);
+            log.info("editCategory for {} {} finished", catId, categoryForUpdate);
             return mapper.map(categoryForUpdate, CategoryDto.class);
         } else {
             throw new CategoryAlreadyExistsException(String
                     .format("Category with name %s already exists", categoryFromRepository.getName()));
         }
         categoryRepository.save(categoryForUpdate);
-        log.info("patchCategory for {} {} finished", catId, categoryForUpdate);
+        log.info("editCategory for {} {} finished", catId, categoryForUpdate);
         return mapper.map(categoryForUpdate, CategoryDto.class);
     }
 

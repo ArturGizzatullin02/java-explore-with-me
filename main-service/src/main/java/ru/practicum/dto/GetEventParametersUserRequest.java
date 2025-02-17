@@ -3,38 +3,24 @@ package ru.practicum.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import ru.practicum.model.EventSort;
-import ru.practicum.validator.StartBeforeEndUserConstraint;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@StartBeforeEndUserConstraint
-public class GetEventParametersUserRequest {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class GetEventParametersUserRequest extends GetEventParametersBaseRequest {
 
     private String text;
 
-    private List<Long> categories;
-
     private Boolean paid;
-
-    private LocalDateTime rangeStart;
-
-    private LocalDateTime rangeEnd;
 
     @Builder.Default
     private Boolean onlyAvailable = false;
 
     private EventSort sort;
-
-    @Builder.Default
-    private Integer from = 0;
-
-    @Builder.Default
-    private Integer size = 10;
 }

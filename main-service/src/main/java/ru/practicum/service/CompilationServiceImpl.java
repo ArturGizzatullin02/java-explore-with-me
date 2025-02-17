@@ -73,7 +73,8 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     @Transactional
-    public CompilationDto patchCompilation(long compId, UpdateCompilationRequest updateCompilationRequest) {
+    public CompilationDto editCompilation(long compId, UpdateCompilationRequest updateCompilationRequest) {
+        log.info("Started editCompilation for {}", updateCompilationRequest);
         Compilation compilationFromRepository = compilationRepository.findById(compId)
                 .orElseThrow(() -> new CompilationNotFoundException(String.format("Compilation %d not found", compId)));
 
@@ -93,13 +94,13 @@ public class CompilationServiceImpl implements CompilationService {
             result.setEvents(savedCompilation.getEvents().stream()
                     .map(event -> mapper.map(event, EventShortDto.class))
                     .toList());
-            log.info("patchCompilation finished for {}", result);
+            log.info("editCompilation finished for {}", result);
         }
         CompilationDto result = mapper.map(compilationFromRepository, CompilationDto.class);
         result.setEvents(compilationFromRepository.getEvents().stream()
                 .map(event -> mapper.map(event, EventShortDto.class))
                 .toList());
-        log.info("patchCompilation finished for {}", result);
+        log.info("editCompilation finished for {}", result);
         return result;
     }
 

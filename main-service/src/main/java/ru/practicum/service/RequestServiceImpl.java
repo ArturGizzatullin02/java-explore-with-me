@@ -103,7 +103,7 @@ public class RequestServiceImpl implements RequestService {
             throw new RequestByInitiatorException(String
                     .format("Request by initiator %d for event %d not allowed", userId, eventId));
         }
-        if (event.getState().equals(EventState.PENDING)) {
+        if (EventState.PENDING.equals(event.getState())) {
             throw new RequestForPendingEventException(String
                     .format("Request for pending event %d not allowed", eventId));
         }
@@ -121,7 +121,7 @@ public class RequestServiceImpl implements RequestService {
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with id %d not found", userId)));
         Request request = requestRepository.findByIdAndRequester(requestId, userId)
                 .orElseThrow(() -> new RequestNotFoundException(String.format("Request with id %d not found", requestId)));
-        if (request.getStatus().equals(ParticipationRequestStatus.CONFIRMED)) {
+        if (ParticipationRequestStatus.CONFIRMED.equals(request.getStatus())) {
             throw new RequestAlreadyConfirmedException(String.format("Request with id %d already confirmed", requestId));
         }
         request.setStatus(ParticipationRequestStatus.CANCELED);

@@ -11,7 +11,7 @@ public interface CategoryService {
 
     void deleteCategory(long catId);
 
-    CategoryDto patchCategory(long catId, NewCategoryDto newCategoryDto);
+    CategoryDto editCategory(long catId, NewCategoryDto newCategoryDto);
 
     List<CategoryDto> getAllCategoriesWithPageable(int from, int size);
 

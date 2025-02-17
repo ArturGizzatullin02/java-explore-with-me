@@ -12,7 +12,7 @@ public interface CompilationService {
 
     void deleteCompilation(long compId);
 
-    CompilationDto patchCompilation(long compId, UpdateCompilationRequest updateCompilationRequest);
+    CompilationDto editCompilation(long compId, UpdateCompilationRequest updateCompilationRequest);
 
     List<CompilationDto> getCompilations(Boolean pinned, int from, int size);
 
