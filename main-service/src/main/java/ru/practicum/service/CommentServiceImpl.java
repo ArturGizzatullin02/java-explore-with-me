@@ -67,7 +67,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto patchCommentTextOfCurrentUser(long userId, long commentId, NewCommentDto newCommentDto) {
+    public CommentDto editCommentTextOfCurrentUser(long userId, long commentId, NewCommentDto newCommentDto) {
         log.info("Started patch comment {} by user {} with text {}", commentId, userId, newCommentDto);
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(String
                 .format("Comment with id %s not found", commentId)));
@@ -84,7 +84,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto patchCommentText(long commentId, NewCommentDto newCommentDto) {
+    public CommentDto editCommentText(long commentId, NewCommentDto newCommentDto) {
         log.info("Started patch comment {} with text {}", commentId, newCommentDto);
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(String
                 .format("Comment with id %s not found", commentId)));

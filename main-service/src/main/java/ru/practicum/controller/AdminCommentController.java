@@ -32,9 +32,9 @@ public class AdminCommentController {
     }
 
     @PatchMapping
-    public CommentDto patchCommentText(@PathVariable long commentId, @RequestBody @Valid NewCommentDto newCommentDto) {
+    public CommentDto editCommentText(@PathVariable long commentId, @RequestBody @Valid NewCommentDto newCommentDto) {
         log.info("Started update comment {}. New comment: {}", commentId, newCommentDto);
-        CommentDto commentDto = commentService.patchCommentText(commentId, newCommentDto);
+        CommentDto commentDto = commentService.editCommentText(commentId, newCommentDto);
         log.info("Finished update comment {}. New comment: {}", commentId, commentDto);
         return commentDto;
     }

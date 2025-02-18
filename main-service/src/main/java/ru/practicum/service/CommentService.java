@@ -9,9 +9,9 @@ public interface CommentService {
 
     CommentDto createComment(long userId, long eventId, NewCommentDto newCommentDto);
 
-    CommentDto patchCommentTextOfCurrentUser(long userId, long commentId, NewCommentDto newCommentDto);
+    CommentDto editCommentTextOfCurrentUser(long userId, long commentId, NewCommentDto newCommentDto);
 
-    CommentDto patchCommentText(long commentId, NewCommentDto newCommentDto);
+    CommentDto editCommentText(long commentId, NewCommentDto newCommentDto);
 
     void deleteCommentOfCurrentUser(long userId, long commentId);
 

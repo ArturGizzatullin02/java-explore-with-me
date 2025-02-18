@@ -45,9 +45,9 @@ public class PrivateCommentController {
     }
 
     @PatchMapping("/comments/{commentId}")
-    public CommentDto patchCommentTextOfCurrentUser(@PathVariable long userId, @PathVariable long commentId, @RequestBody @Valid NewCommentDto newCommentDto) {
+    public CommentDto editCommentTextOfCurrentUser(@PathVariable long userId, @PathVariable long commentId, @RequestBody @Valid NewCommentDto newCommentDto) {
         log.info("Started update comment {} by user {}. New comment: {}", commentId, userId, newCommentDto);
-        CommentDto commentDto = commentService.patchCommentTextOfCurrentUser(userId, commentId, newCommentDto);
+        CommentDto commentDto = commentService.editCommentTextOfCurrentUser(userId, commentId, newCommentDto);
         log.info("Finished update comment {} by user {}. New comment: {}", commentId, userId, commentDto);
         return commentDto;
     }
